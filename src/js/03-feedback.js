@@ -31,7 +31,7 @@ for (let input of form.elements) {
   }
 }
 
-handleSubmit = event => {
+const handleSubmit = event => {
   event.preventDefault();
   event.currentTarget.reset();
   localStorage.clear();
