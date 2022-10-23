@@ -9,7 +9,7 @@ const player = new Player(iframe);
 const startTime = localStorage.getItem(KEY_TIME)
   ? Number(localStorage.getItem(KEY_TIME))
   : 0;
-localStorage.clear();
+
 player.setCurrentTime(startTime);
 
 console.log(throttle);
