@@ -3,34 +3,40 @@ import throttle from 'lodash.throttle';
 
 const FORM_VALUES_KEY = 'feedback-form-state';
 
-const values = storage.loadFromStorage(FORM_VALUES_KEY);
+const saveFeedback = throttle(event => {
+  // search parent form element
+  if (event.currentTarget) {
+    let from = event.currentTarget;
+    while (from.nodeName !== 'FORM') {
+      from = from.parentNode;
+    }
 
-const printFeedback = throttle(event => {
-  const formValues = inputSet.reduce(
-    (formValues, input) => {
-      formValues[input.name] = input.value;
-      return formValues;
-    },
+    // collect object from form fields
+    const data = new FormData(from);
 
-    {}
-  );
-
-  storage.saveToStorage(FORM_VALUES_KEY, formValues);
+    const formValues = {};
+    data.forEach((value, key) => {
+      formValues[key] = value;
+    });
+    // save to local storage
+    storage.saveToStorage(FORM_VALUES_KEY, formValues);
+  }
 }, 500);
 
+// fill form fields from local storage
+const values = storage.loadFromStorage(FORM_VALUES_KEY);
 const form = document.querySelector('.feedback-form');
-const inputSet = [];
+
 for (let input of form.elements) {
   if (input.name) {
-    inputSet.push(input);
-
     if (values && values[input.name]) {
       input.value = values[input.name];
     }
-    input.addEventListener('input', printFeedback);
+    input.addEventListener('input', saveFeedback);
   }
 }
 
+// reset form
 const handleSubmit = event => {
   event.preventDefault();
   event.currentTarget.reset();
